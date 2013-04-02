@@ -48,6 +48,7 @@ class Grid( object ):
                     # right justified
                     fmt = "%%-%d.%ds" % ( col_widths[i], col_widths[i] ) 
                 retval +=  fmt % token
+                retval += " "
             retval += "\n"
         return retval
 
