@@ -19,6 +19,7 @@ class Grid( object ):
 
     def __str__( self ):
         # find col_widthsa
+        retval = ''
         col_widths = []
         for c in range( self.cols ):
             col_max = 0
@@ -46,9 +47,9 @@ class Grid( object ):
                 else:
                     # right justified
                     fmt = "%%-%d.%ds" % ( col_widths[i], col_widths[i] ) 
-                print fmt % token,
-            print
-        return ''
+                retval +=  fmt % token
+            retval += "\n"
+        return retval
 
 
 class Diagram( object ):
@@ -75,10 +76,13 @@ class Diagram( object ):
         m.add_transition( Transition( lane1, name, lane2 ) )
         return m
 
-    def render( self ) :
-        print "=" * len( self.name )
-        print self.name
-        print "=" * len( self.name )
+    def render( self ):
+        retval = ''
+        retval +=  "=" * len( self.name )
+        retval += "\n"
+        retval +=  self.name + "\n"
+        retval +=  "=" * len( self.name )
+        retval += "\n"
 
         g = Grid()
         g.start_row()
@@ -106,7 +110,7 @@ class Diagram( object ):
                 distance = right - left
 
 
-                print " " * ( MIN_LANE_WIDTH * left ), 
+                retval += " " * ( MIN_LANE_WIDTH * left )
                 g.start_row()
                 for i in range( left * 2 ): # 1 for each lane and transitionlane
                     g.add_token( " " * ( MIN_LANE_WIDTH * 1 ) )#left ) )
@@ -153,10 +157,9 @@ class Diagram( object ):
                 #print t.name
 
         
-        print   
-        #print "grid-style"
-        print   
-        print g 
+        retval += "\n\n"   
+        retval += str( g  ) 
+        return retval
 
     def collect_lanes( self ):
         lanes = []
@@ -220,7 +223,7 @@ def test():
     d.start_moment( "case2" )
     d.add_transition( "client.activate", "calls", "backend.find_or_create" )
     d.add_transition( "backend", "returns to", "client.handle_id" )
-    d.render()
+    print d.render()
 
 class Frame( object ):
     def __init__( self, obj, depth=0 ):
@@ -260,8 +263,8 @@ class LoggerDiagram( Diagram ):
 
 
     def called_with( self, callee, kwargs ):
-	caller_frame = self._get_caller()
-	callee_frame = Frame(callee)
+        caller_frame = self._get_caller()
+        callee_frame = Frame(callee)
 
         if caller_frame.obj == callee_frame.obj:
             # recursed
@@ -345,7 +348,7 @@ def test_likely_code_integration():
     d.returning( "r1" )
     d.returning( "r1" )
     d.returning( "r1" )
-    d.render()
+    print d.render()
 
 def test_decorator():
     d = LoggerDiagram("test3")
@@ -369,11 +372,26 @@ def test_decorator():
         myfunc(4)
     except Exception, e:
         pass
-    d.render()
-    
+    print d.render()
+
+def test_generator():
+    d = LoggerDiagram("test4")
+    d.start_moment( "generators" )
+
+    @d.dec_maker( "local.mygen")
+    def a_generator_says_wat( num ):
+        for x in range( num ):
+            yield x
+
+    for i in a_generator_says_wat(3):
+        print i
+
+    print d.render()
+
 
 if __name__ == '__main__':
     test()
     test_likely_code_integration()
     test_decorator()
+    test_generator()
 
