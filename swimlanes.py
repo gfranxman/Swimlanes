@@ -198,14 +198,17 @@ class Transition( object ):
     @staticmethod
     def _extract_lane( lstr ):
         if "." in lstr:
-            lstr, func = lstr.split( ".", 2 ) 
+            try:
+                lstr, func = lstr.split( ".", 1 ) 
+            except ValueError as ve:
+                print(f"ooooooops upacking {lstr}")
         return lstr
 
     @staticmethod
     def _extract_func( lstr ):
         func = "+"
         if "." in lstr:
-            lstr, func = lstr.split( ".", 2 ) 
+            lstr, func = lstr.split( ".", 1 ) 
         return func
 
 
@@ -368,7 +371,7 @@ def test_decorator():
         if depth == 2:
             subscriber_info( depth )
         if depth == 3:
-            x = 1/0
+            x = 1/0 # intentional div by zero error
         return depth
 
     try:
@@ -384,7 +387,7 @@ def test_generator():
     @d.dec_maker( "local.mygen")
     def a_generator_says_wat( num ):
         for x in range( num ):
-            yield x
+            yield f"wat#{x}"
 
     for i in a_generator_says_wat(3):
         print (i)
