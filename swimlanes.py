@@ -3,6 +3,8 @@ LEFT = '<'
 RIGHT = '>'
 THRU = '-'
 
+def cmp(a, b):
+    return (a > b) - (a < b) 
 
 class Grid( object ):
     def __init__( self ):
@@ -27,7 +29,7 @@ class Grid( object ):
                 try:
                     col_max = max( col_max, len( r[c] ) )
                     #print r[c], len( r[c] )
-                except IndexError, no_col:
+                except IndexError as no_col:
                     pass
             #print col_max
             col_widths.append( col_max )
@@ -62,7 +64,7 @@ class Diagram( object ):
     def get_moment( self, name="" ):
         try:
             m = self.moments[-1]
-        except IndexError, no_moments:
+        except IndexError as no_moments:
             m = Moment(name)
             self.moments.append( m ) 
         return m 
@@ -154,7 +156,7 @@ class Diagram( object ):
                         #print t.func1
                         g.add_token( t.func1 )
 
-		g.add_token( t.name )
+                g.add_token( t.name )
                 #print t.name
 
         
@@ -224,17 +226,17 @@ def test():
     d.start_moment( "case2" )
     d.add_transition( "client.activate", "calls", "backend.find_or_create" )
     d.add_transition( "backend", "returns to", "client.handle_id" )
-    print d.render()
+    print( d.render() )
 
 class Frame( object ):
     def __init__( self, obj, depth=0 ):
         self.obj = obj
         self.depth = depth
 
-	if "." in self.obj:
+        if "." in self.obj:
             self.ns, self.func = self.obj.split(".",2) 
         else:
-	    self.ns, self.func = obj, obj
+            self.ns, self.func = obj, obj
 
     def __str__( self ):
         if "." in self.obj:
@@ -306,16 +308,16 @@ class LoggerDiagram( Diagram ):
             def wrapped( *args, **kwargs ):
                 #print "in wrapped"
                 params = []
-		if args:
-			params = args
-		if kwargs:
-			params.append( kwargs )
+                if args:
+                        params = args
+                if kwargs:
+                        params.append( kwargs )
                 _DL_.called_with( _NAME_, params )
                 try:
                     retval = fn( *args, **kwargs )
                     _DL_.returning( retval )
                     return retval
-                except Exception, e:
+                except Exception as e:
                     _DL_.excepting( e )
                     raise e
             return wrapped
@@ -349,7 +351,7 @@ def test_likely_code_integration():
     d.returning( "r1" )
     d.returning( "r1" )
     d.returning( "r1" )
-    print d.render()
+    print( d.render() )
 
 def test_decorator():
     d = LoggerDiagram("test3")
@@ -371,9 +373,9 @@ def test_decorator():
 
     try:
         myfunc(4)
-    except Exception, e:
+    except Exception as e:
         pass
-    print d.render()
+    print( d.render( ))
 
 def test_generator():
     d = LoggerDiagram("test4")
@@ -385,9 +387,9 @@ def test_generator():
             yield x
 
     for i in a_generator_says_wat(3):
-        print i
+        print (i)
 
-    print d.render()
+    print( d.render())
 
 
 if __name__ == '__main__':
